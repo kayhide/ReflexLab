@@ -12,7 +12,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Lib
+  exposed-modules:     Lib, LibReflex, LibTree, Nested
   build-depends:       base >= 4.7 && < 5,
                        ref-tf,
                        reflex,
@@ -22,7 +22,7 @@ library
                        random
   default-language:    Haskell2010
 
-executable ReflexFRP-exe
+executable ReflexLab-exe
   hs-source-dirs:      app
   main-is:             Main.hs
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
