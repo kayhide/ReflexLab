@@ -65,17 +65,17 @@ makeStyle = el "style" $ text "\
 \    display: none;\
 \}"
 
-treeNodeAtMay :: T.Tree a -> Int -> Maybe ( T.Tree a )
-treeNodeAtMay t i = atMay (T.subForest t) i
+subForestAtMay :: T.Tree a -> Int -> Maybe ( T.Tree a )
+subForestAtMay t i = atMay (T.subForest t) i
 
 treeAtMay :: T.Tree a -> [Int] -> Maybe ( T.Tree a )
-treeAtMay t i = foldl (\x y -> if isNothing x then Nothing else treeNodeAtMay (fromJust x) y) (Just t) i
+treeAtMay t i = foldl (\x y -> if isNothing x then Nothing else subForestAtMay (fromJust x) y) (Just t) i
 
-treeNodeAt :: T.Tree a -> Int -> T.Tree a
-treeNodeAt t i = (T.subForest t) !! i
+subForestAt :: T.Tree a -> Int -> T.Tree a
+subForestAt t i = (T.subForest t) !! i
 
 treeAt :: T.Tree a -> [Int] -> T.Tree a
-treeAt t i = foldl (\x y -> treeNodeAt x y) t i
+treeAt t i = foldl (\x y -> subForestAt x y) t i
 
 elId :: MonadWidget t m => String -> String -> m a -> m a
 elId tagName id func = elAttr tagName (M.fromList [("id", id)]) func
@@ -235,7 +235,7 @@ eChilds :: Existence -> [Existence]
 eChilds (Existence et seed parentUniverse) =
     let this     = Existence et seed parentUniverse
         gen      = mkStdGen seed                     -- random number generator
-        randInts = randoms gen :: [Int]             -- random Int value
+        randInts = randoms gen :: [Int]              -- random Int value
         dn x y   = randomRs (x :: Int, y :: Int) gen -- x ~ y random value
         makeExistence et seed = Existence et seed parentUniverse
      in case et of
@@ -248,7 +248,7 @@ eChilds (Existence et seed parentUniverse) =
                 seedInts = take n_childs $ tail randInts
              in map (\s -> makeExistence Galaxy s) seedInts
         Galaxy ->
-            let n_childs = ((dn 3 14) !! 0)
+            let n_childs = ((dn 8 19) !! 0)
                 d100Ints = take n_childs $ tail $ dn 1 100
                 seedInts = take n_childs $ drop n_childs $ tail randInts
              in map (\(d, s) -> case d of
