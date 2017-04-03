@@ -5,7 +5,7 @@ module Lib
 
 import qualified LibReflex (makeStyle)
 import LibReflex hiding (makeStyle)
-import Nested (Existence(Universe), eChilds)
+import Nested (Existence(Universe), childs)
 
 import qualified Data.Map as M
 import qualified Data.Tree as T
@@ -66,7 +66,7 @@ treeModule seed = elId "div" "treeModule" $ do
 
     let init_ext = Universe seed init_ext
 
-    drawTree $ T.unfoldTree (\x -> (show x, eChilds x)) init_ext
+    drawTree $ T.unfoldTree (\x -> (show x, childs x)) init_ext
 
     return ()
 

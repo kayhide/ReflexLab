@@ -1,4 +1,4 @@
-module Nested (Existence(..), eChilds) where
+module Nested (Existence(..), childs) where
 
 import System.Random
 
@@ -42,8 +42,8 @@ dn :: Int -> Int -> Int -> [Int]
 dn x y s = randomRs (x, y) $ gen s
 
 -- get childs of the existence
-eChilds :: Existence -> [Existence]
-eChilds ext =
+childs :: Existence -> [Existence]
+childs ext =
     case ext of
         Universe seed pu ->
             let n_childs = ((dn 7 22 seed) !! 0)
