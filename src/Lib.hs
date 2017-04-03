@@ -1,5 +1,3 @@
-{-# LANGUAGE RecursiveDo #-}
-
 module Lib
     ( startApp ) where
 
