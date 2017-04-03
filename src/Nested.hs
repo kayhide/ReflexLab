@@ -2,6 +2,20 @@ module Nested (Existence(..), childs) where
 
 import System.Random
 
+data GalaxyType =
+      Elliptical
+    | Lenticular
+    | Spirals
+    | BarredSpirals
+
+-- choice GalaxyType at random by the Galaxy's seed value
+getGalaxyType :: Existence -> GalaxyType
+getGalaxyType (Galaxy seed _) = case (dn 0 3 seed) !! 0 of
+    0 -> Elliptical
+    1 -> Lenticular
+    2 -> Spirals
+    3 -> BarredSpirals
+
 -- Universe seed parentUniverse
 -- seed           : random seed of the Existence
 -- parentUniverse : what universe the Existence belongs to
@@ -20,7 +34,11 @@ data Existence =
 instance Show Existence where
     show (Universe     _ _) = "宇宙"
     show (Supercluster _ _) = "超銀河団"
-    show (Galaxy       _ _) = "銀河"
+    show (Galaxy       s e) = case getGalaxyType (Galaxy s e) of
+        Elliptical    -> "楕円型銀河"
+        Lenticular    -> "レンズ型銀河"
+        Spirals       -> "渦巻型銀河"
+        BarredSpirals -> "棒渦巻型銀河"
     show (SolarSystem  _ _) = "星系"
     show (Nebula       _ _) = "星雲"
     show (Star         _ _) = "恒星"
