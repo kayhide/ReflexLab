@@ -28,12 +28,21 @@ instance Show Existence where
     show (Blackhole    _ _) = "ブラックホール"
     show (Whitehole    _ _) = "ホワイトホール"
 
+-- random number generator with seed s (alias of mkStdGen)
+gen :: Int -> StdGen
+gen = mkStdGen
+
+-- random Int value with seed s
+randInts :: Int -> [Int]
+randInts s = randoms $ gen s
+
+-- x ~ y random value with seed s
+dn :: Int -> Int -> Int -> [Int]
+dn x y s = randomRs (x, y) $ gen s
+
 eChilds :: Existence -> [Existence]
 eChilds ext =
-    let gen s      = mkStdGen s                            -- random number generator with seed s
-        randInts s = randoms (gen s) :: [Int]              -- random Int value with seed s
-        dn x y s   = randomRs (x :: Int, y :: Int) (gen s) -- x ~ y random value with seed s
-     in case ext of
+    case ext of
         Universe seed pu ->
             let n_childs = ((dn 7 22 seed) !! 0)
                 seedInts = take n_childs $ tail $ randInts seed
