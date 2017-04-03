@@ -24,6 +24,7 @@ makeStyle = el "style" $ text "\
 \    border: 1px #324 solid;\
 \    border-radius: 4px;\
 \    display: inline-block;\
+\    vertical-align: top;\
 \}\
 \#selectModule {\
 \    border: 1px #324 solid;\
