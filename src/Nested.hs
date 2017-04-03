@@ -40,6 +40,7 @@ randInts s = randoms $ gen s
 dn :: Int -> Int -> Int -> [Int]
 dn x y s = randomRs (x, y) $ gen s
 
+-- get childs of the existence
 eChilds :: Existence -> [Existence]
 eChilds ext =
     case ext of
