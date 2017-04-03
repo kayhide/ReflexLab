@@ -17,7 +17,7 @@ makeStyle = el "style" $ text "\
 \body {\
 \    color: #333;\
 \}\
-\#selectModule, #treeModule {\
+\#selectModule, #selectModuleTogglable, #treeModule {\
 \    margin: 1em;\
 \    padding: 1em;\
 \    border: 1px #324 solid;\
@@ -39,10 +39,7 @@ selectModule = elId "div" "selectModule" $ do
     item <- selectList_value ["aaaaa", "bbbbb", "aiueo", "kakikukeko"]
 
     txt1 <- forDyn item $ \i -> do
-        if isNothing i then
-            "=== NOT SELECTED ==="
-        else
-            "current: " ++ (fromJust i)
+        show i
 
     item_change <- foldDyn (:) [] (updated item)
 
@@ -54,6 +51,19 @@ selectModule = elId "div" "selectModule" $ do
     br
 
     dynText txt2
+
+    return ()
+
+selectModuleTogglable :: MonadWidget t m => m ()
+selectModuleTogglable = elId "div" "selectModuleTogglable" $ do
+    elAttr "h1" (M.fromList [("style", "margin-top: 0;")]) $ text "select module #2"
+
+    item <- selectListTogglable_value ["aaaaa", "bbbbb", "aiueo", "kakikukeko"]
+
+    txt <- forDyn item $ \i -> do
+        show i
+
+    dynText txt
 
     return ()
 
@@ -75,6 +85,7 @@ startApp = do
         LibReflex.makeStyle
         makeStyle
         selectModule
+        selectModuleTogglable
         -- treeModule seed
         treeModule 666
         return ()

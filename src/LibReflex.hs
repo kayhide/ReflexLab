@@ -69,10 +69,10 @@ btn = mdo
     (btn_elem, events) <- generate_button bool
     return bool
 
-selectList :: MonadWidget t m => [String] -> m ( Dynamic t Int )
-selectList arr = do
+generateSelectList :: MonadWidget t m => ([Event t Int] -> m (Dynamic t Int)) -> [String] -> m ( Dynamic t Int )
+generateSelectList events_arr_func arr = do
     index <- elClass "div" "selectList" $ mdo
-        index <- foldDyn (\e p -> e) (-1) $ leftmost events_arr
+        index <- events_arr_func events_arr
         events_arr <- mapM (\x -> do
             (elm, _) <- elClass' "div" "item" $ do
                 bool <- forDyn index $ \i -> x == i
@@ -82,11 +82,23 @@ selectList arr = do
         return index
     return index
 
-selectList_value :: MonadWidget t m => [String] -> m ( Dynamic t (Maybe String) )
-selectList_value arr = do
-    index <- selectList arr
+generateSelectList_value :: MonadWidget t m => ([Event t Int] -> m (Dynamic t Int)) -> [String] -> m ( Dynamic t (Maybe String) )
+generateSelectList_value events_arr_func arr = do
+    index <- generateSelectList events_arr_func arr
     value <- forDyn index $ \i -> atMay arr i
     return value
+
+selectList :: MonadWidget t m => [String] -> m ( Dynamic t Int )
+selectList       = generateSelectList       (\x -> foldDyn (\e p -> e) (-1) $ leftmost x)
+
+selectList_value :: MonadWidget t m => [String] -> m ( Dynamic t (Maybe String) )
+selectList_value = generateSelectList_value (\x -> foldDyn (\e p -> e) (-1) $ leftmost x)
+
+selectListTogglable :: MonadWidget t m => [String] -> m ( Dynamic t Int )
+selectListTogglable       = generateSelectList       (\x -> foldDyn (\e p -> if e == p then -1 else e) (-1) $ leftmost x)
+
+selectListTogglable_value :: MonadWidget t m => [String] -> m ( Dynamic t (Maybe String) )
+selectListTogglable_value = generateSelectList_value (\x -> foldDyn (\e p -> if e == p then -1 else e) (-1) $ leftmost x)
 
 drawTree :: MonadWidget t m => T.Tree String -> m ()
 drawTree tree = elClass "div" "tree" $ drawTreeMain tree []
