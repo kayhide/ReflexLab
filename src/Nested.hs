@@ -30,9 +30,9 @@ instance Show Existence where
 
 eChilds :: Existence -> [Existence]
 eChilds ext =
-    let gen s      = mkStdGen s                            -- random number generator
-        randInts s = randoms (gen s) :: [Int]              -- random Int value
-        dn x y s   = randomRs (x :: Int, y :: Int) (gen s) -- x ~ y random value
+    let gen s      = mkStdGen s                            -- random number generator with seed s
+        randInts s = randoms (gen s) :: [Int]              -- random Int value with seed s
+        dn x y s   = randomRs (x :: Int, y :: Int) (gen s) -- x ~ y random value with seed s
      in case ext of
         Universe seed pu ->
             let n_childs = ((dn 7 22 seed) !! 0)
