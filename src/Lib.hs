@@ -1,4 +1,5 @@
 {-# LANGUAGE RecursiveDo #-}
+{-# LANGUAGE GADTs #-}
 
 module Lib
     ( startApp ) where
@@ -190,97 +191,78 @@ selectModule = elId "div" "selectModule" $ do
 
     return ()
 
-data ExistenceType =
-      Universe
-    | Supercluster
-    | Galaxy
-    | SolarSystem
-    | Nebula
-    | Star
-    | Planet
-    | UpQuark
-    | Blackhole
-    | Whitehole
-instance Show ExistenceType where
-    show x = case x of
-        Universe     -> "宇宙"
-        Supercluster -> "超銀河団"
-        Galaxy       -> "銀河"
-        SolarSystem  -> "星系"
-        Nebula       -> "星雲"
-        Star         -> "恒星"
-        Planet       -> "惑星"
-        UpQuark      -> "アップクオーク"
-        Blackhole    -> "ブラックホール"
-        Whitehole    -> "ホワイトホール"
 
--- Existence et seed parentUniverse
--- et             : ExistenceType of the Existence
 -- seed           : random seed of the Existence
 -- parentUniverse : what universe the Existence belongs to
-data Existence = Existence ExistenceType Int Existence
-
-eType :: Existence -> ExistenceType
-eType (Existence et _ _) = et
-
-eSeed :: Existence -> Int
-eSeed (Existence _ seed _) = seed
-
-eParentUniverse :: Existence -> Existence
-eParentUniverse (Existence _ _ e) = e
-
--- et     : ExistenceType
--- seed   : random seed
-eChilds :: Existence -> [Existence]
-eChilds (Existence et seed parentUniverse) =
-    let this     = Existence et seed parentUniverse
-        gen      = mkStdGen seed                     -- random number generator
-        randInts = randoms gen :: [Int]              -- random Int value
-        dn x y   = randomRs (x :: Int, y :: Int) gen -- x ~ y random value
-        makeExistence et seed = Existence et seed parentUniverse
-     in case et of
-        Universe ->
-            let n_childs = ((dn 7 22) !! 0)
-                seedInts = take n_childs $ tail randInts
-             in map (\s -> Existence Supercluster s this) seedInts
-        Supercluster ->
-            let n_childs = ((dn 3 14) !! 0)
-                seedInts = take n_childs $ tail randInts
-             in map (\s -> makeExistence Galaxy s) seedInts
-        Galaxy ->
-            let n_childs = ((dn 8 19) !! 0)
-                d100Ints = take n_childs $ tail $ dn 1 100
-                seedInts = take n_childs $ drop n_childs $ tail randInts
-             in map (\(d, s) -> case d of
-                    d | d <= 20   -> makeExistence Blackhole s
-                    d | d <= 80   -> makeExistence SolarSystem s
-                    d | otherwise -> makeExistence Nebula s) $ zip d100Ints seedInts
-        SolarSystem ->
-            let n_stars     = ((dn 1 3) !! 0)
-                n_planets   = ((dn 0 8) !! 1)
-                seedstars   = take n_stars   $ drop 2 $ randInts
-                seedplanets = take n_planets $ drop (2 + n_stars) $ randInts
-                stars       = map (\s -> makeExistence Star s) seedstars
-                planets     = map (\s -> makeExistence Planet s) seedplanets
-             in stars ++ planets
-        Nebula -> []
-        Star -> []
-        Planet -> []
-        UpQuark -> []
-        Blackhole -> [makeExistence Whitehole (randInts !! 0)]
-        Whitehole -> [parentUniverse]
+data Existence =
+      Universe     Int Existence
+    | Supercluster Int Existence
+    | Galaxy       Int Existence
+    | SolarSystem  Int Existence
+    | Nebula       Int Existence
+    | Star         Int Existence
+    | Planet       Int Existence
+    | UpQuark      Int Existence
+    | Blackhole    Int Existence
+    | Whitehole    Int Existence
 
 instance Show Existence where
-    show (Existence et _ _) = show et
+    show (Universe     _ _) = "宇宙"
+    show (Supercluster _ _) = "超銀河団"
+    show (Galaxy       _ _) = "銀河"
+    show (SolarSystem  _ _) = "星系"
+    show (Nebula       _ _) = "星雲"
+    show (Star         _ _) = "恒星"
+    show (Planet       _ _) = "惑星"
+    show (UpQuark      _ _) = "アップクオーク"
+    show (Blackhole    _ _) = "ブラックホール"
+    show (Whitehole    _ _) = "ホワイトホール"
+
+eChilds :: Existence -> [Existence]
+eChilds ext =
+    let gen s      = mkStdGen s                            -- random number generator
+        randInts s = randoms (gen s) :: [Int]              -- random Int value
+        dn x y s   = randomRs (x :: Int, y :: Int) (gen s) -- x ~ y random value
+     in case ext of
+        Universe seed pu ->
+            let n_childs = ((dn 7 22 seed) !! 0)
+                seedInts = take n_childs $ tail $ randInts seed
+             in map (\s -> Supercluster s ext) seedInts
+        Supercluster seed pu ->
+            let n_childs = ((dn 3 14 seed) !! 0)
+                seedInts = take n_childs $ tail $ randInts seed
+             in map (\s -> Galaxy s pu) seedInts
+        Galaxy seed pu ->
+            let n_childs = ((dn 8 19 seed) !! 0)
+                d100Ints = take n_childs $ tail $ dn 1 100 seed
+                seedInts = take n_childs $ drop n_childs $ tail $ randInts seed
+             in map (\(d, s) -> case d of
+                    d | d <= 20   -> Blackhole s pu
+                    d | d <= 80   -> SolarSystem s pu
+                    d | otherwise -> Nebula s pu) $ zip d100Ints seedInts
+        SolarSystem seed pu ->
+            let n_stars     = ((dn 1 3 seed) !! 0)
+                n_planets   = ((dn 0 8 seed) !! 1)
+                seedstars   = take n_stars   $ drop 2 $ randInts seed
+                seedplanets = take n_planets $ drop (2 + n_stars) $ randInts seed
+                stars       = map (\s -> Star s pu) seedstars
+                planets     = map (\s -> Planet s pu) seedplanets
+             in stars ++ planets
+        Nebula seed pu -> []
+        Star seed pu -> []
+        Planet seed pu -> []
+        UpQuark seed pu -> []
+        Blackhole seed pu -> [Whitehole ((randInts seed) !! 0) pu]
+        Whitehole seed pu -> [pu]
 
 treeModule :: MonadWidget t m => Int -> m ()
 treeModule seed = elId "div" "treeModule" $ do
 
     elAttr "h1" (M.fromList [("style", "margin-top: 0;")]) $ text "tree module"
 
-    let init_tree = Existence Universe seed init_tree
+    let init_ext = Universe seed init_ext
 
-    drawTree $ T.unfoldTree (\x -> (show x, eChilds x)) init_tree
+    drawTree $ T.unfoldTree (\x -> (show x, eChilds x)) init_ext
 
     return ()
 
