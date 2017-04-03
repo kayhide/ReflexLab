@@ -2,6 +2,7 @@ module Nested (Existence(..), eChilds) where
 
 import System.Random
 
+-- Universe seed parentUniverse
 -- seed           : random seed of the Existence
 -- parentUniverse : what universe the Existence belongs to
 data Existence =
