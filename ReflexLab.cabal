@@ -12,7 +12,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Lib, LibReflex, LibTree, Nested
+  exposed-modules:     Lib, LibReflex, LibTree, Nested, NameDB
   build-depends:       base >= 4.7 && < 5,
                        ref-tf,
                        reflex,
