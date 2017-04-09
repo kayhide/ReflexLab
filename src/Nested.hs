@@ -29,6 +29,8 @@ randoms' len gen = foldl
                 ([], gen)
                 (take len [0..])
 
+
+
 data Universe = Universe Int AllExistence
 
 instance Existence Universe where
@@ -50,11 +52,12 @@ instance Existence Supercluster where
     parent (Supercluster _ p) = p
     childs (Supercluster seed parent) =
         let this = Supercluster seed parent
-            (n_childs, gen1) = randomR (7, 22) $ mkStdGen seed
+            (n_childs, gen1) = randomR (3, 14) $ mkStdGen seed
             (seedInts, gen2) = randoms' n_childs gen1
             (gTypes  , _   ) = randoms' n_childs gen2
          in map ( \(s, gt) -> E $ Galaxy s (E this) gt ) $ zip seedInts gTypes
     name   (Supercluster _ _) = "超銀河団"
+
 
 
 data Galaxy = Galaxy Int AllExistence GalaxyType
@@ -62,7 +65,15 @@ data Galaxy = Galaxy Int AllExistence GalaxyType
 instance Existence Galaxy where
     seed   (Galaxy s _ _) = s
     parent (Galaxy _ p _) = p
-    childs (Galaxy seed parent gt) = []
+    childs (Galaxy seed parent gt) =
+        let this = Galaxy seed parent gt
+            (n_childs, gen1) = randomR (8, 19) $ mkStdGen seed
+            (d100Ints, gen2) = randomRs' (0, 100) n_childs gen1
+            (seedInts, _   ) = randoms' n_childs gen2
+         in map ( \(d, s) -> case d of
+            d | d <= (20 :: Int) -> E $ Blackhole   s (E this)
+            d | d <= (80 :: Int) -> E $ SolarSystem s (E this)
+            d | otherwise        -> E $ Nebula      s (E this) ) $ zip d100Ints seedInts
     name   (Galaxy _ _ Elliptical   ) = "楕円型銀河"
     name   (Galaxy _ _ Lenticular   ) = "レンズ型銀河"
     name   (Galaxy _ _ Spirals      ) = "渦巻型銀河"
@@ -81,3 +92,33 @@ instance Random GalaxyType where
     random gen = 
         let t = randomR (fromEnum (minBound :: GalaxyType), fromEnum (maxBound :: GalaxyType)) gen
          in (toEnum $ fst t, snd t)
+
+
+
+data Blackhole = Blackhole Int AllExistence
+
+instance Existence Blackhole where
+    seed   (Blackhole s _) = s
+    parent (Blackhole _ p) = p
+    childs (Blackhole seed parent) = []
+    name   (Blackhole _ _) = "ブラックホール"
+
+
+
+data SolarSystem = SolarSystem Int AllExistence
+
+instance Existence SolarSystem where
+    seed   (SolarSystem s _) = s
+    parent (SolarSystem _ p) = p
+    childs (SolarSystem seed parent) = []
+    name   (SolarSystem _ _) = "星系"
+
+
+
+data Nebula = Nebula Int AllExistence
+
+instance Existence Nebula where
+    seed   (Nebula s _) = s
+    parent (Nebula _ p) = p
+    childs (Nebula seed parent) = []
+    name   (Nebula _ _) = "星雲"
