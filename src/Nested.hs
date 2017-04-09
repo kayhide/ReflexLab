@@ -113,6 +113,111 @@ instance Existence Nebula where
     childs (Nebula seed parent) = []
     name   (Nebula _ _) = "星雲"
 
+data Water = Water Int AllExistence
+
+instance Existence Water where
+    seed   (Water s _) = s
+    parent (Water _ p) = p
+    childs (Water seed parent) =
+        let this = Water seed parent
+         in []
+    name   (Water _ _) = "水"
+
+
+
+data Hydrogen = Hydrogen Int AllExistence
+
+instance Existence Hydrogen where
+    seed   (Hydrogen s _) = s
+    parent (Hydrogen _ p) = p
+    childs (Hydrogen seed parent) =
+        let this = Hydrogen seed parent
+         in []
+    name   (Hydrogen _ _) = "水素"
+
+
+
+data Oxygen = Oxygen Int AllExistence
+
+instance Existence Oxygen where
+    seed   (Oxygen s _) = s
+    parent (Oxygen _ p) = p
+    childs (Oxygen seed parent) =
+        let this = Oxygen seed parent
+         in []
+    name   (Oxygen _ _) = "酸素"
+
+
+
+data Helium = Helium Int AllExistence
+
+instance Existence Helium where
+    seed   (Helium s _) = s
+    parent (Helium _ p) = p
+    childs (Helium seed parent) =
+        let this = Helium seed parent
+         in []
+    name   (Helium _ _) = "ヘリウム"
+
+
+
+data Proton = Proton Int AllExistence
+
+instance Existence Proton where
+    seed   (Proton s _) = s
+    parent (Proton _ p) = p
+    childs (Proton seed parent) =
+        let this = Proton seed parent
+         in []
+    name   (Proton _ _) = "陽子"
+
+
+
+data Neutron = Neutron Int AllExistence
+
+instance Existence Neutron where
+    seed   (Neutron s _) = s
+    parent (Neutron _ p) = p
+    childs (Neutron seed parent) =
+        let this = Neutron seed parent
+         in []
+    name   (Neutron _ _) = "中性子"
+
+
+
+data Electron = Electron Int AllExistence
+
+instance Existence Electron where
+    seed   (Electron s _) = s
+    parent (Electron _ p) = p
+    childs (Electron seed parent) =
+        let this = Electron seed parent
+         in []
+    name   (Electron _ _) = "電子"
+
+
+data UpQuark = UpQuark Int AllExistence
+
+instance Existence UpQuark where
+    seed   (UpQuark s _) = s
+    parent (UpQuark _ p) = p
+    childs (UpQuark seed parent) =
+        let this = UpQuark seed parent
+         in []
+    name   (UpQuark _ _) = "アップクオーク"
+
+
+
+data DownQuark = DownQuark Int AllExistence
+
+instance Existence DownQuark where
+    seed   (DownQuark s _) = s
+    parent (DownQuark _ p) = p
+    childs (DownQuark seed parent) =
+        let this = DownQuark seed parent
+         in []
+    name   (DownQuark _ _) = "ダウンクオーク"
+
 
 
 data Blackhole = Blackhole Int AllExistence
