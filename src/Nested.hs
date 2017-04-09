@@ -95,16 +95,6 @@ instance Random GalaxyType where
 
 
 
-data Blackhole = Blackhole Int AllExistence
-
-instance Existence Blackhole where
-    seed   (Blackhole s _) = s
-    parent (Blackhole _ p) = p
-    childs (Blackhole seed parent) = []
-    name   (Blackhole _ _) = "ブラックホール"
-
-
-
 data SolarSystem = SolarSystem Int AllExistence
 
 instance Existence SolarSystem where
@@ -122,3 +112,32 @@ instance Existence Nebula where
     parent (Nebula _ p) = p
     childs (Nebula seed parent) = []
     name   (Nebula _ _) = "星雲"
+
+
+
+data Blackhole = Blackhole Int AllExistence
+
+instance Existence Blackhole where
+    seed   (Blackhole s _) = s
+    parent (Blackhole _ p) = p
+    childs (Blackhole seed parent) = 
+        let this = Blackhole seed parent
+         in [E $ Whitehole (fst $ random $ mkStdGen seed) (E this) ]
+    name   (Blackhole _ _) = "ブラックホール"
+
+
+
+data Whitehole = Whitehole Int AllExistence
+
+instance Existence Whitehole where
+    seed   (Whitehole s _) = s
+    parent (Whitehole _ p) = p
+    childs (Whitehole seed parent) =
+        let this = Whitehole seed parent
+         in [getParentUniverse $ E this]
+    name   (Whitehole _ _) = "ホワイトホール"
+
+getParentUniverse :: AllExistence -> AllExistence
+getParentUniverse (E a) = (\(E b) -> case name b of
+    "宇宙" -> E b -- TODO: あとで直す Unsafeつかわないとむりかも
+    otherwise -> getParentUniverse $ E b) (parent a)
