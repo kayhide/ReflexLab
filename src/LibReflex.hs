@@ -70,17 +70,15 @@ btn = mdo
     return bool
 
 generateSelectList :: MonadWidget t m => ([Event t Int] -> m (Dynamic t Int)) -> [String] -> m ( Dynamic t Int )
-generateSelectList events_arr_func arr = do
-    index <- elClass "div" "selectList" $ mdo
+generateSelectList events_arr_func arr =
+    return =<< elClass "div" "selectList" $ mdo
         index <- events_arr_func events_arr
         events_arr <- mapM (\x -> do
             (elm, _) <- elClass' "div" "item" $ do
-                bool <- forDyn index $ \i -> x == i
-                generate_button bool
+                generate_button =<< (forDyn index $ \i -> x == i)
                 text $ arr !! x
             return $ tag (constant x) $ domEvent Click elm) $ take (length arr) [0..]
         return index
-    return index
 
 generateSelectList_value :: MonadWidget t m => ([Event t Int] -> m (Dynamic t Int)) -> [String] -> m ( Dynamic t (Maybe String) )
 generateSelectList_value events_arr_func arr = do
