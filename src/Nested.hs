@@ -21,14 +21,9 @@ instance Existence Universe where
     seed   (Universe s _) = s
     parent (Universe _ p) = p
     childs (Universe seed parent) =
-        let this = Universe seed parent
-            (n_childs, gen) = randomR (7, 22) $ mkStdGen seed
-         in snd $ foldl
-                (\(g, es) _ ->
-                    let (s, ng) = random g
-                     in (ng, es ++ [E $ Supercluster s $ E this]))
-                (gen, [])
-                (take n_childs [0..])
+        let (n_childs, gen) = randomR (7, 22) $ mkStdGen seed
+            seedInts = take n_childs $ randoms gen
+         in map (\s -> E $ Supercluster s $ E $ Universe seed parent ) seedInts
     name   (Universe _ _) = "宇宙"
 
 
