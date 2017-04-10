@@ -113,6 +113,8 @@ instance Existence Nebula where
     childs (Nebula seed parent) = []
     name   (Nebula _ _) = "星雲"
 
+
+
 data Water = Water Int AllExistence
 
 instance Existence Water where
@@ -120,7 +122,8 @@ instance Existence Water where
     parent (Water _ p) = p
     childs (Water seed parent) =
         let this = Water seed parent
-         in []
+            randInts = randoms $ mkStdGen seed
+         in [E $ Hydrogen (randInts !! 0) (E this), E $ Oxygen (randInts !! 1) (E this)]
     name   (Water _ _) = "水"
 
 
@@ -132,7 +135,8 @@ instance Existence Hydrogen where
     parent (Hydrogen _ p) = p
     childs (Hydrogen seed parent) =
         let this = Hydrogen seed parent
-         in []
+            randInts = randoms $ mkStdGen seed
+         in [E $ Proton (randInts !! 0) (E this), E $ Electron (randInts !! 1) (E this)]
     name   (Hydrogen _ _) = "水素"
 
 
@@ -144,7 +148,8 @@ instance Existence Oxygen where
     parent (Oxygen _ p) = p
     childs (Oxygen seed parent) =
         let this = Oxygen seed parent
-         in []
+            randInts = randoms $ mkStdGen seed
+         in [E $ Proton (randInts !! 0) (E this), E $ Electron (randInts !! 1) (E this)]
     name   (Oxygen _ _) = "酸素"
 
 
@@ -156,7 +161,8 @@ instance Existence Helium where
     parent (Helium _ p) = p
     childs (Helium seed parent) =
         let this = Helium seed parent
-         in []
+            randInts = randoms $ mkStdGen seed
+         in [E $ Proton (randInts !! 0) (E this), E $ Neutron (randInts !! 1) (E this), E $ Electron (randInts !! 2) (E this)]
     name   (Helium _ _) = "ヘリウム"
 
 
@@ -168,7 +174,8 @@ instance Existence Proton where
     parent (Proton _ p) = p
     childs (Proton seed parent) =
         let this = Proton seed parent
-         in []
+            randInts = randoms $ mkStdGen seed
+         in [E $ UpQuark (randInts !! 0) (E this), E $ UpQuark (randInts !! 1) (E this), E $ DownQuark (randInts !! 2) (E this)]
     name   (Proton _ _) = "陽子"
 
 
@@ -180,7 +187,8 @@ instance Existence Neutron where
     parent (Neutron _ p) = p
     childs (Neutron seed parent) =
         let this = Neutron seed parent
-         in []
+            randInts = randoms $ mkStdGen seed
+         in [E $ DownQuark (randInts !! 0) (E this), E $ DownQuark (randInts !! 1) (E this), E $ UpQuark (randInts !! 2) (E this)]
     name   (Neutron _ _) = "中性子"
 
 
@@ -191,8 +199,10 @@ instance Existence Electron where
     seed   (Electron s _) = s
     parent (Electron _ p) = p
     childs (Electron seed parent) =
-        let this = Electron seed parent
-         in []
+        let this = Neutron seed parent
+            (n_childs, gen) = randomR (4, 16) $ mkStdGen seed
+            (seedInts, _  ) = randoms' n_childs gen
+         in map ( \s -> E $ Universe s (E this) ) seedInts
     name   (Electron _ _) = "電子"
 
 
@@ -202,8 +212,10 @@ instance Existence UpQuark where
     seed   (UpQuark s _) = s
     parent (UpQuark _ p) = p
     childs (UpQuark seed parent) =
-        let this = UpQuark seed parent
-         in []
+        let this = Neutron seed parent
+            (n_childs, gen) = randomR (3, 9) $ mkStdGen seed
+            (seedInts, _  ) = randoms' n_childs gen
+         in map ( \s -> E $ Universe s (E this) ) seedInts
     name   (UpQuark _ _) = "アップクオーク"
 
 
@@ -214,8 +226,10 @@ instance Existence DownQuark where
     seed   (DownQuark s _) = s
     parent (DownQuark _ p) = p
     childs (DownQuark seed parent) =
-        let this = DownQuark seed parent
-         in []
+        let this = Neutron seed parent
+            (n_childs, gen) = randomR (8, 13) $ mkStdGen seed
+            (seedInts, _  ) = randoms' n_childs gen
+         in map ( \s -> E $ Universe s (E this) ) seedInts
     name   (DownQuark _ _) = "ダウンクオーク"
 
 
@@ -227,7 +241,8 @@ instance Existence Blackhole where
     parent (Blackhole _ p) = p
     childs (Blackhole seed parent) = 
         let this = Blackhole seed parent
-         in [E $ Whitehole (fst $ random $ mkStdGen seed) (E this) ]
+            randInts = randoms $ mkStdGen seed
+         in [E $ Whitehole (randInts !! 0) (E this) ]
     name   (Blackhole _ _) = "ブラックホール"
 
 
