@@ -100,7 +100,12 @@ data SolarSystem = SolarSystem Int AllExistence
 instance Existence SolarSystem where
     seed   (SolarSystem s _) = s
     parent (SolarSystem _ p) = p
-    childs (SolarSystem seed parent) = []
+    childs (SolarSystem seed parent) = 
+        let this = SolarSystem seed parent
+            (n_planets  , gen1) = randomR (2, 8) $ mkStdGen seed
+            (seedstar   , gen2) = random gen1
+            (seedplanets, _   ) = randoms' n_planets gen2
+         in ( E $ Star seedstar (E this) ) : map ( \s -> E $ Planet s (E this) ) seedplanets
     name   (SolarSystem _ _) = "星系"
 
 
@@ -112,6 +117,127 @@ instance Existence Nebula where
     parent (Nebula _ p) = p
     childs (Nebula seed parent) = []
     name   (Nebula _ _) = "星雲"
+
+
+
+data Star = Star Int AllExistence
+
+instance Existence Star where
+    seed   (Star s _) = s
+    parent (Star _ p) = p
+    childs (Star seed parent) =
+        let this = Star seed parent
+            randInts = randoms $ mkStdGen seed
+         in [E $ Hydrogen (randInts !! 0) (E this), E $ Helium (randInts !! 1) (E this)]
+    name   (Star _ _) = "恒星"
+
+
+
+data Planet = Planet Int AllExistence
+
+instance Existence Planet where
+    seed   (Planet s _) = s
+    parent (Planet _ p) = p
+    childs (Planet seed parent) =
+        let this = Planet seed parent
+            (n_moons, gen1) = randomR (0, 3) $ mkStdGen seed
+            (n_conts, gen2) = randomR (1, 6) gen1
+            (n_ocean, gen3) = randomR (1, 9) gen2
+            (s_moons, gen4) = randoms' n_moons gen3
+            (s_conts, gen5) = randoms' n_conts gen4
+            (s_ocean, gen6) = randoms' n_ocean gen5
+            (s_sky  , gen7) = random gen6
+            (s_core , _   ) = random gen7
+         in    ( E $ Sky  s_sky  (E this) )
+            :  ( E $ Core s_core (E this) )
+            :  map ( \s -> E $ Moon      s (E this) ) s_moons
+            ++ map ( \s -> E $ Continent s (E this) ) s_conts
+            ++ map ( \s -> E $ Ocean     s (E this) ) s_ocean
+    name   (Planet _ _) = "惑星"
+
+
+
+data Continent = Continent Int AllExistence
+
+instance Existence Continent where
+    seed   (Continent s _) = s
+    parent (Continent _ p) = p
+    childs (Continent seed parent) =
+        let this = Continent seed parent
+         in []
+    name   (Continent _ _) = "大陸"
+
+
+
+data Ocean = Ocean Int AllExistence
+
+instance Existence Ocean where
+    seed   (Ocean s _) = s
+    parent (Ocean _ p) = p
+    childs (Ocean seed parent) =
+        let this = Ocean seed parent
+         in []
+    name   (Ocean _ _) = "海"
+
+
+
+data Sky = Sky Int AllExistence
+
+instance Existence Sky where
+    seed   (Sky s _) = s
+    parent (Sky _ p) = p
+    childs (Sky seed parent) =
+        let this = Sky seed parent
+         in []
+    name   (Sky _ _) = "空"
+
+
+
+data Core = Core Int AllExistence
+
+instance Existence Core where
+    seed   (Core s _) = s
+    parent (Core _ p) = p
+    childs (Core seed parent) =
+        let this = Core seed parent
+         in []
+    name   (Core _ _) = "核"
+
+
+
+data Moon = Moon Int AllExistence
+
+instance Existence Moon where
+    seed   (Moon s _) = s
+    parent (Moon _ p) = p
+    childs (Moon seed parent) =
+        let this = Moon seed parent
+         in []
+    name   (Moon _ _) = "月"
+
+
+
+data Rock = Rock Int AllExistence
+
+instance Existence Rock where
+    seed   (Rock s _) = s
+    parent (Rock _ p) = p
+    childs (Rock seed parent) =
+        let this = Rock seed parent
+         in []
+    name   (Rock _ _) = "岩石"
+
+
+
+data Soil = Soil Int AllExistence
+
+instance Existence Soil where
+    seed   (Soil s _) = s
+    parent (Soil _ p) = p
+    childs (Soil seed parent) =
+        let this = Soil seed parent
+         in []
+    name   (Soil _ _) = "土"
 
 
 
