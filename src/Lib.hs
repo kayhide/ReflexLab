@@ -74,7 +74,7 @@ treeModule seed = elId "div" "treeModule" $ do
 
     let init_ext = N.Universe seed (N.E init_ext)
 
-    drawTree $ T.unfoldTree (\(N.E x) -> (N.name x ++ (show $ N.seed x), N.childs x)) $ N.E init_ext
+    drawTree $ T.unfoldTree (\(N.E x) -> (show $ N.seed x, N.childs x)) $ N.E init_ext
 
     return ()
 
