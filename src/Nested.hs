@@ -217,7 +217,18 @@ instance Existence Moon where
     parent (Moon _ p) = p
     childs (Moon seed parent) =
         let this = Moon seed parent
-         in []
+            (n_rocks, gen1) = randomR (0 :: Int, 11) $ mkStdGen seed
+            (n_water, gen2) = randomR (0 :: Int, 4) gen1
+            (n_soils, gen3) = randomR (0 :: Int, 4) gen2
+            (n_oxygs, gen4) = randomR (0 :: Int, 8) gen3
+            (s_rocks, gen5) = randoms' n_rocks gen4
+            (s_water, gen6) = randoms' n_rocks gen5
+            (s_soils, gen7) = randoms' n_rocks gen6
+            (s_oxygs, _   ) = randoms' n_rocks gen7
+         in    map ( \s -> E $ Rock   s (E this) ) s_rocks
+            ++ map ( \s -> E $ Water  s (E this) ) s_water
+            ++ map ( \s -> E $ Soil   s (E this) ) s_soils
+            ++ map ( \s -> E $ Oxygen s (E this) ) s_oxygs
     name   (Moon _ _) = "月"
 
 
