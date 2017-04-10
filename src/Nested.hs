@@ -2,6 +2,7 @@
 
 module Nested where
 
+import NameDB (german_all)
 import System.Random
 
 data AllExistence = forall a. (Existence a) => E a
@@ -140,32 +141,36 @@ instance Existence Planet where
     parent (Planet _ p) = p
     childs (Planet seed parent) =
         let this = Planet seed parent
-            (n_moons, gen1) = randomR (0, 3) $ mkStdGen seed
-            (n_conts, gen2) = randomR (1, 6) gen1
-            (n_ocean, gen3) = randomR (1, 9) gen2
-            (s_moons, gen4) = randoms' n_moons gen3
-            (s_conts, gen5) = randoms' n_conts gen4
-            (s_ocean, gen6) = randoms' n_ocean gen5
-            (s_sky  , gen7) = random gen6
-            (s_core , _   ) = random gen7
+            (n_moons , gen1) = randomR (0, 3) $ mkStdGen seed
+            (n_conts , gen2) = randomR (1, 6) gen1
+            (n_ocean , gen3) = randomR (1, 9) gen2
+            (s_moons , gen4) = randoms' n_moons gen3
+            (s_conts , gen5) = randoms' n_conts gen4
+            (d100Ints, gen6) = randomRs' (0, 100) n_conts gen5
+            (s_ocean , gen7) = randoms' n_ocean gen6
+            (s_sky   , gen8) = random gen7
+            (s_core  , _   ) = random gen8
          in    ( E $ Sky  s_sky  (E this) )
             :  ( E $ Core s_core (E this) )
-            :  map ( \s -> E $ Moon      s (E this) ) s_moons
-            ++ map ( \s -> E $ Continent s (E this) ) s_conts
-            ++ map ( \s -> E $ Ocean     s (E this) ) s_ocean
+            :  map ( \s      -> E $ Moon      s (E this)                   ) s_moons
+            ++ map ( \(s, d) -> E $ Continent s (E this) (d < (20 :: Int)) ) ( zip s_conts d100Ints )
+            ++ map ( \s      -> E $ Ocean     s (E this)                   ) s_ocean
     name   (Planet _ _) = "惑星"
 
 
 
-data Continent = Continent Int AllExistence
+data Continent = Continent Int AllExistence Bool
 
 instance Existence Continent where
-    seed   (Continent s _) = s
-    parent (Continent _ p) = p
-    childs (Continent seed parent) =
+    seed   (Continent s _ _) = s
+    parent (Continent _ p _) = p
+    childs (Continent seed parent isExplored) =
         let this = Continent seed parent
+            (nameindex, gen1) = randomR (0, length german_all - 1) $ mkStdGen seed
          in []
-    name   (Continent _ _) = "大陸"
+    name   (Continent seed parent isExplored) =
+        let (nameindex, gen1) = randomR (0, length german_all - 1) $ mkStdGen seed
+         in if isExplored then (german_all !! nameindex) ++ "大陸" else "大陸"
 
 
 
