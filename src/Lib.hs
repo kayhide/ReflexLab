@@ -86,6 +86,5 @@ startApp = do
         makeStyle
         selectModule
         selectModuleTogglable
-        -- treeModule seed
-        treeModule 666
+        treeModule seed
         return ()
