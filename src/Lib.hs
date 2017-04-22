@@ -12,6 +12,8 @@ import Data.Maybe (isNothing, fromJust)
 import Safe (atMay)
 import System.Random (getStdRandom, random)
 
+import qualified NeoNested
+
 makeStyle :: MonadWidget t m => m ()
 makeStyle = el "style" $ text "\
 \body {\
@@ -74,7 +76,8 @@ treeModule seed = elId "div" "treeModule" $ do
 
     let init_ext = N.Universe seed (N.E init_ext)
 
-    drawTree $ T.unfoldTree (\(N.E x) -> (N.name x, N.childs x)) $ N.E init_ext
+    -- drawTree $ T.unfoldTree (\(N.E x) -> (N.name x, N.childs x)) $ N.E init_ext
+    drawTree $ NeoNested.generateTree seed
 
     return ()
 
