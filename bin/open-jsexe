@@ -1,0 +1,19 @@
+#! /bin/sh
+
+root=$(stack path --project-root)
+name=$(basename $root)
+dist_dir=$(stack path --dist-dir)
+jsexe_dir=$dist_dir/build/$name/$name.jsexe
+index=$jsexe_dir/index.html
+
+if [ ! -f $index ]; then
+   echo "jsexe files are not found."
+   echo $index
+   exit 1
+fi
+
+if which browser-sync > /dev/null; then
+    browser-sync start --server --ss "$jsexe_dir" --files "$jsexe_dir/*.js"
+else
+    open $index
+fi
