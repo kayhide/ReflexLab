@@ -77,7 +77,7 @@ treeModule seed = elId "div" "treeModule" $ do
     let init_ext = N.Universe seed (N.E init_ext)
 
     -- drawTree $ T.unfoldTree (\(N.E x) -> (N.name x, N.childs x)) $ N.E init_ext
-    drawTree $ NeoNested.generateTree seed
+    drawTree $ NeoNested.generateUniverse seed
 
     return ()
 

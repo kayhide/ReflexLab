@@ -15,36 +15,61 @@ generateName gen = names ! i
   where names = Vector.fromList german_all
         (i, _) = randomR (0, (length names) - 1) gen
 
+splits :: StdGen -> [StdGen]
+splits = unfoldr (Just . split)
 
-data Thing = Universe | Supercluster | Galaxy
+
+data Thing = Universe
+           | Supercluster
+           | Galaxy
+           | Nebula
+           | SolarSystem
+           | Blackhole
+           | Whitehole
+           | Star
+           | Planet
+
 data NamedThing = NamedThing Thing String
+
+type Bearability = (Thing, (Int, Int))
 
 instance Show Thing where
   show Universe = "宇宙"
   show Supercluster = "超銀河団"
   show Galaxy = "銀河"
+  show Nebula = "星雲"
+  show SolarSystem = "星系"
+  show Blackhole = "ブラックホール"
+  show Whitehole = "ホワイトホール"
+  show Star = "太陽"
+  show Planet = "星"
 
 instance Show NamedThing where
-  show (NamedThing Universe _) = show Universe
+  show (NamedThing thing@Universe _) = show thing
+  show (NamedThing thing@Blackhole name) = name ++ "・" ++ show thing
+  show (NamedThing thing@Whitehole name) = name ++ "・" ++ show thing
   show (NamedThing thing name) = name ++ show thing
 
-generateTree :: Int -> Tree String
-generateTree seed = unfoldTree generate (Universe, mkStdGen seed)
+generateUniverse :: Int -> Tree String
+generateUniverse seed = unfoldTree generate (Universe, mkStdGen seed)
 
 generate :: (Thing, StdGen) -> (String, [(Thing, StdGen)])
 generate (thing, gen) = (show (NamedThing thing name), nexts)
-  where things = bearableThings thing
-        n = length things
+  where (gen':gen'':gens) = splits gen
+        name = generateName gen'
+        children = do
+          ((thing', range), g) <- zip (bearabilitiesOf thing) $ splits gen''
+          let n = fst $ randomR range g
+          replicate n thing'
         nexts = zip children gens
-        (gen':gen'':gen''':gens) = unfoldr (Just . split) gen
-        count = childrenCount thing gen'
-        children = fmap (things !!) $ take count $ randomRs (0, n - 1) gen''
-        name = generateName gen'''
 
-bearableThings :: Thing -> [Thing]
-bearableThings Universe = [Supercluster]
-bearableThings Supercluster = [Galaxy]
-bearableThings Galaxy = [Universe]
-
-childrenCount :: Thing -> StdGen -> Int
-childrenCount _ gen = fst $ randomR (3, 8) gen
+bearabilitiesOf :: Thing -> [Bearability]
+bearabilitiesOf Universe = [(Supercluster, (4, 8))]
+bearabilitiesOf Supercluster = [(Galaxy, (4, 5))]
+bearabilitiesOf Galaxy = [(Nebula, (1, 3)), (SolarSystem, (2, 3)), (Blackhole, (0, 1))]
+bearabilitiesOf Nebula = [(SolarSystem, (1, 2))]
+bearabilitiesOf SolarSystem = [(Star, (1, 2)), (Planet, (5, 8))]
+bearabilitiesOf Blackhole = [(Whitehole, (1, 1))]
+bearabilitiesOf Whitehole = [(Universe, (1, 1))]
+bearabilitiesOf Star = []
+bearabilitiesOf Planet = []
